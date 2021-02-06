@@ -1,0 +1,17 @@
+
+#parent {
+    color: #00D000;
+    background: url('asd.png') no-repeat;
+    margin: 10px;
+    /* test comment 0*/
+}
+
+/* test comment 1*/
+
+.container {
+    border: 1px solid gray;
+}
+
+/* test comment 3
+    muttiline
+*/
