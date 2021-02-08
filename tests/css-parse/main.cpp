@@ -14,7 +14,7 @@ int main()
 
 			if(!node.has_value()) break;
 
-			//std::cout << node->Path << std::endl;
+			std::cout << node->Path << std::endl;
 		} while(node.has_value());
 	}
 

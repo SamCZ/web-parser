@@ -20,7 +20,7 @@ add_library(web-parser ${PROJECT_SOURCE})
 target_include_directories(web-parser PUBLIC src/)
 
 if(BUILD_TESTING)
-    include(CTest)
+    #include(CTest)
     enable_testing()
 
     add_subdirectory(tests)

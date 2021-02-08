@@ -10,6 +10,7 @@
 #include <fstream>
 
 #include "../util/String.hpp"
+#include "../css/CssHierarchy.hpp"
 
 namespace HtmlParser
 {
@@ -37,62 +38,6 @@ namespace HtmlParser
 		inline XmlNode() = default;
 		inline explicit XmlNode(std::string tagName) : m_TagName(std::move(tagName)) {}
 	private:
-		static inline std::vector<std::string> SmartSplitAttributes(std::string& tagName)
-		{
-			std::vector<std::string> attributes;
-
-			bool isReadingEscaped = false;
-			std::string currentAttrData;
-
-			int firstSpace = -1;
-
-			for (int i = 0; i < tagName.length(); ++i) {
-				char currentChar = tagName[i];
-
-				if(std::isspace(currentChar)) {
-					firstSpace = i;
-					break;
-				}
-			}
-
-			if(firstSpace == std::string::npos) {
-				return attributes;
-			}
-
-			for (int i = firstSpace + 1; i < tagName.length(); ++i) {
-				char currentChar = tagName[i];
-
-				switch (currentChar) {
-					case 0x20: // space (SPC)
-					case 0x09: // horizontal tab (TAB)
-					case 0x0d: // carriage return (CR)
-					case 0x0a: // newline (LF)
-						if(!isReadingEscaped) {
-							attributes.push_back(currentAttrData);
-							currentAttrData = "";
-						}
-						currentAttrData += " ";
-						break;
-					case '"':
-						isReadingEscaped = !isReadingEscaped;
-						break;
-					default:
-						currentAttrData += currentChar;
-						break;
-				}
-
-
-			}
-
-			if(currentAttrData.length() > 0) {
-				attributes.push_back(currentAttrData);
-			}
-
-			tagName = tagName.substr(0, firstSpace);
-
-			return attributes;
-		}
-
 		inline XmlNode& AddChild(XmlNode& node)
 		{
 			std::vector<std::string> attributePackList = SmartSplitAttributes(node.m_TagName);
@@ -123,10 +68,25 @@ namespace HtmlParser
 				}
 			}
 
+			node.FixContentEnding();
+
 			node.m_Parent = this;
 			m_Childrens.push_back(node);
 			node.m_Attributes.clear();
 			return m_Childrens.back();
+		}
+
+		inline void FixContentEnding()
+		{
+			if(!m_Content.empty()) {
+				int i;
+				for (i = static_cast<int>(m_Content.length()) - 1; i >= 0; --i) {
+					if(!std::isspace(m_Content[i])) {
+						break;
+					}
+				}
+				m_Content.resize(i + 1);
+			}
 		}
 	public:
 		typedef std::vector<XmlNode>::iterator iterator;
@@ -249,10 +209,16 @@ namespace HtmlParser
 	{
 	public:
 		XmlDocument() : XmlNode("RootNode") {}
-	public:
-		static XmlStatus Load(XmlDocument& document, const std::filesystem::path& path);
-		static XmlStatus Load(XmlDocument& document, std::istream& stream);
 
+		void LoadStylesheet(const std::filesystem::path& path);
+		void LoadStylesheet(std::istream& stream);
+		void LoadStylesheet(std::string& css);
+		void LoadStylesheet(const Css::Hierarchy& cssHierarchy);
+
+		void ClearAllStylesheets();
+	public:
+		static XmlStatus Parse(XmlDocument& document, const std::filesystem::path& path);
+		static XmlStatus Parse(XmlDocument& document, std::istream& stream);
 	private:
 		static void ReadTag(XmlNode& currentNode, const std::string& xmlFileData, uint32_t offset);
 	};

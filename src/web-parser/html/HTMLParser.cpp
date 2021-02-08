@@ -1,4 +1,6 @@
 #include "HTMLParser.hpp"
+#include "../css/CssParser.hpp"
+#include "../css/CssClassPath.hpp"
 
 namespace HtmlParser
 {
@@ -28,6 +30,7 @@ namespace HtmlParser
 					readingTag = false;
 					if(isEndTag) {
 						currentNode.m_Content = childNode.m_Content;
+						currentNode.FixContentEnding();
 						ReadTag(*currentNode.m_Parent, xmlFileData, i + 1);
 						return;
 					} else if(xmlFileData[i - 1] == '/') {
@@ -66,7 +69,8 @@ namespace HtmlParser
 			}
 		}
 	}
-	XmlStatus XmlDocument::Load(XmlDocument &document, const std::filesystem::path& path)
+
+	XmlStatus XmlDocument::Parse(XmlDocument &document, const std::filesystem::path& path)
 	{
 		std::fstream stream;
 		stream.open(path);
@@ -75,15 +79,58 @@ namespace HtmlParser
 			return XmlStatus::FileNotFound;
 		}
 
-		return Load(document, stream);
+		return Parse(document, stream);
 	}
 
-	XmlStatus XmlDocument::Load(XmlDocument &document, std::istream& stream)
+	XmlStatus XmlDocument::Parse(XmlDocument &document, std::istream& stream)
 	{
 		std::string xmlFileData(std::istreambuf_iterator<char>(stream), {});
 
 		ReadTag(document, xmlFileData, 0);
 
 		return XmlStatus::Loaded;
+	}
+
+	void XmlDocument::LoadStylesheet(const std::filesystem::path &path)
+	{
+		auto css = Css::Hierarchy::Parse(path);
+
+		if(css.has_value()) {
+			LoadStylesheet(css.value());
+		} else {
+			throw std::runtime_error("Cannot load " + path.string());
+		}
+	}
+
+	void XmlDocument::LoadStylesheet(std::istream &stream)
+	{
+		auto css = Css::Hierarchy::Parse(stream);
+
+		if(css.has_value()) {
+			LoadStylesheet(css.value());
+		} else {
+			throw std::runtime_error("Cannot load css from stream !");
+		}
+	}
+
+	void XmlDocument::LoadStylesheet(std::string &css)
+	{
+		auto cssh = Css::Hierarchy::Parse(css);
+
+		if(cssh.has_value()) {
+			LoadStylesheet(cssh.value());
+		} else {
+			throw std::runtime_error("Cannot parse css from string !");
+		}
+	}
+
+	void XmlDocument::LoadStylesheet(const Css::Hierarchy &cssHierarchy)
+	{
+		// TODO: apply styles
+	}
+
+	void XmlDocument::ClearAllStylesheets()
+	{
+		// TODO: Clear all styles
 	}
 }

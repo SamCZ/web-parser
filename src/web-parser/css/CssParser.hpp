@@ -14,6 +14,7 @@ namespace Css::CssParser
 	{
 		explicit Node(std::string path) : Path(std::move(path)), Style()
 		{
+
 		}
 
 		std::string Path;

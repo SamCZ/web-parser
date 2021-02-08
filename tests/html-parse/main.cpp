@@ -6,9 +6,9 @@ using namespace HtmlParser;
 int main()
 {
 	XmlDocument doc;
-	if(XmlDocument::Load(doc, "page.html") == XmlStatus::Loaded) {
+	if(XmlDocument::Parse(doc, "page.html") == XmlStatus::Loaded) {
 		std::function<void(const XmlNode&, int)> fnc;
-		fnc = [&fnc](const XmlNode& node, int depth){
+		fnc = [&fnc](const XmlNode& node, int depth) {
 			std::string spaces;
 			for (int i = 0; i < depth; ++i) {
 				spaces += "-";
@@ -30,7 +30,7 @@ int main()
 		std::cout << doc.FindElementById("panel")->GetChild(0)->GetContent() << std::endl;
 
 		for(const XmlNode& el : doc.FindElementsByClass("one")) {
-			std::cout << "class: " << el.GetTagName() << el.GetChildCount() << el.GetContent() << std::endl;
+			//std::cout << "class: " << el.GetTagName() << el.GetChildCount() << el.GetContent() << std::endl;
 		}
 	}
 }
