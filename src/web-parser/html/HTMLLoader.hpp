@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <fstream>
 
+#include "../util/String.hpp"
+
 namespace HtmlParser
 {
 	enum class XmlStatus : uint8_t
@@ -35,24 +37,6 @@ namespace HtmlParser
 		inline XmlNode() = default;
 		inline explicit XmlNode(std::string tagName) : m_TagName(std::move(tagName)) {}
 	private:
-		static inline std::vector<std::string> SplitString(const std::string& str, char delimiter)
-		{
-			std::vector<std::string> list;
-			std::string buffer;
-
-			for (char c : str) {
-				if(c == delimiter) {
-					if(!buffer.empty()) {
-						list.push_back(buffer);
-					}
-				} else {
-					buffer += c;
-				}
-			}
-
-			return list;
-		}
-
 		static inline std::vector<std::string> SmartSplitAttributes(std::string& tagName)
 		{
 			std::vector<std::string> attributes;
