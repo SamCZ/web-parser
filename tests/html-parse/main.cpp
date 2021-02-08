@@ -1,4 +1,4 @@
-#include <web-parser/html/HTMLLoader.hpp>
+#include <web-parser/html/HTMLParser.hpp>
 #include <iostream>
 
 using namespace HtmlParser;
