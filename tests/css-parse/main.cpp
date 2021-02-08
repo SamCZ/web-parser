@@ -12,7 +12,9 @@ int main()
 		do {
 			node = Css::CssParser::ParseNode(file);
 
-			std::cout << node->Path << std::endl;
+			if(!node.has_value()) break;
+
+			//std::cout << node->Path << std::endl;
 		} while(node.has_value());
 	}
 

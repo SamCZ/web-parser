@@ -3,6 +3,9 @@
     color: #00D000;
     background: url('asd.png') no-repeat;
     margin: 10px;
+    margin: 0 auto;
+    margin: 10px 10px;
+    margin: 10px 10px 10px 10px;
     /* test comment 0*/
 }
 

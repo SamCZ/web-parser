@@ -53,8 +53,9 @@ namespace Css
 
 	enum class ESizeUnit : uint8_t
 	{
-		Pixels,
-		Percent
+		Pixels = 0,
+		Percent,
+		RelativeToFont
 	};
 
 	struct FBorder
@@ -109,6 +110,7 @@ namespace Css
 	template<typename T1>
 	struct CssValue
 	{
+		bool IsNumericValue;
 		union
 		{
 			T1 Value;
@@ -118,6 +120,16 @@ namespace Css
 				ESizeUnit Unit;
 			};
 		};
+
+		[[maybe_unused]] explicit CssValue(T1 value) : IsNumericValue(false), Value(value)
+		{
+
+		}
+
+		[[maybe_unused]] CssValue(int numValue, ESizeUnit unit) : IsNumericValue(true), NumValue(numValue), Unit(unit)
+		{
+
+		}
 	};
 
 	typedef CssValue<ESizeMode> FUnitValue;

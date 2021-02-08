@@ -2,25 +2,35 @@
 
 #include "Css.hpp"
 
+#include <iostream>
 #include <istream>
 #include <map>
 #include <functional>
 
 namespace Css::CssParser
 {
+
 	struct Node
 	{
-		explicit Node(std::string path) : Path(std::move(path))
+		explicit Node(std::string path) : Path(std::move(path)), Style()
 		{
 		}
 
 		std::string Path;
-		std::map<std::string, std::string> Values;
 		Css::Style Style;
 	};
 
+	extern std::map<std::string, std::function<void(Node&, std::string&, std::string&)>> TokenParsers;
+	extern void InitTokenParsers();
+	static bool TokenParsersInitialized = false;
+
 	static std::optional<Node> ParseNode(std::istream& stream)
 	{
+		if(!TokenParsersInitialized) {
+			TokenParsersInitialized = true;
+			InitTokenParsers();
+		}
+
 		char c = ' ';
 
 		// Skip spaces
@@ -37,12 +47,12 @@ namespace Css::CssParser
 		while(true)
 		{
 			c = stream.get();
-			if(stream.bad())
+			if(stream.bad() || stream.eof())
 			{
 				if(path.empty()) // Empty path
-					break;
+					return {};
 				else if(path.length() == 1 && path[0] == ' ') // Empty path
-					break;
+					return {};
 				else
 					throw std::runtime_error("Data ended too soon");
 			}
@@ -55,7 +65,7 @@ namespace Css::CssParser
 				while(true)
 				{
 					c = stream.get();
-					if(stream.bad())
+					if(stream.bad() || stream.eof())
 						throw std::runtime_error("Comment ended too soon");
 
 					if(c == '*' && stream.peek() == '/')
@@ -85,8 +95,10 @@ namespace Css::CssParser
 
 			path += c;
 		}
-		if(path.empty())
+		if(path.empty()) {
 			throw std::runtime_error("No CSS path");
+			return {};
+		}
 		if(path.back() == ' ') // Remove trailing space
 			path.resize(path.size() - 1);
 
@@ -112,16 +124,6 @@ namespace Css::CssParser
 						break;
 				}*/
 			}
-			else
-			{
-				auto it = node.Values.find(key);
-				if(it != node.Values.end())
-				{
-					//TODO Some values may not fully override previous values
-				}
-
-				node.Values[key] = value;
-			}
 		};
 
 		// Node content
@@ -145,7 +147,7 @@ namespace Css::CssParser
 					while(true)
 					{
 						c = stream.get();
-						if(stream.bad())
+						if(stream.bad() || stream.eof())
 							throw std::runtime_error("Comment ended too soon");
 
 						if(c == '*' && stream.peek() == '/')
@@ -172,8 +174,15 @@ namespace Css::CssParser
 						if(!value.empty() && value.back() == ' ')
 							value.resize(value.size() - 1);
 
-						addContent(key, value);
-
+						//addContent(key, value);
+						if(TokenParsers.contains(key)) {
+							TokenParsers[key](node, key, value);
+						}
+#ifdef DEBUG
+						else {
+							std::cout << "Parser not found for " << key << std::endl;
+						}
+#endif
 						// Cleanup
 						key = std::string();
 						value = std::string();
@@ -220,7 +229,15 @@ namespace Css::CssParser
 						if(!value.empty() && value.back() == ' ')
 							value.resize(value.size() - 1);
 
-						addContent(key, value);
+						//addContent(key, value);
+						if(TokenParsers.contains(key)) {
+							TokenParsers[key](node, key, value);
+						}
+#ifdef DEBUG
+						else {
+							std::cout << "Parser not found for " << key << std::endl;
+						}
+#endif
 
 						// Cleanup
 						key = std::string();
@@ -237,6 +254,8 @@ namespace Css::CssParser
 							if(value.back() == ' ') // Limit spaces to 1
 								continue;
 						}
+
+						value += c;
 					}
 				}
 			}
