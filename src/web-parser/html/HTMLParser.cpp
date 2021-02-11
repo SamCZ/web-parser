@@ -4,6 +4,25 @@
 
 namespace HtmlParser
 {
+	static std::vector<std::string> _AutoClosingTags = {
+			"!DOCTYPE",
+			"meta",
+			"link",
+			"img",
+			"br"
+	};
+
+	static bool IsAutoClosingTag(std::string tag)
+	{
+		auto i = tag.find(' ');
+
+		if(i != std::string::npos) {
+			tag = tag.substr(0, i);
+		}
+
+		return std::find(_AutoClosingTags.begin(), _AutoClosingTags.end(), tag) != _AutoClosingTags.end();
+	}
+
 	void XmlDocument::ReadTag(XmlNode& currentNode, const std::string& xmlFileData, uint32_t offset)
 	{
 		XmlNode childNode;
@@ -33,7 +52,7 @@ namespace HtmlParser
 						currentNode.FixContentEnding();
 						ReadTag(*currentNode.m_Parent, xmlFileData, i + 1);
 						return;
-					} else if(xmlFileData[i - 1] == '/') {
+					} else if(IsAutoClosingTag(childNode.m_TagName) || xmlFileData[i - 1] == '/') {
 						childNode.m_TagName.resize(childNode.m_TagName.length() - 1);
 						childNode.m_Content = "";
 						currentNode.AddChild(childNode);
