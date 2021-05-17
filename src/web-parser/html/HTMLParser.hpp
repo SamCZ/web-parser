@@ -10,6 +10,7 @@
 #include <fstream>
 
 #include "../util/String.hpp"
+#include "../css/Css.hpp"
 #include "../css/CssHierarchy.hpp"
 
 namespace HtmlParser
@@ -34,6 +35,8 @@ namespace HtmlParser
 		std::map<std::string, std::string> m_Attributes;
 		std::string m_ElementId;
 		std::vector<std::string> m_ElementClasses;
+
+		std::optional<Css::Style> m_Style;
 	public:
 		inline XmlNode() = default;
 		inline explicit XmlNode(std::string tagName) : m_TagName(std::move(tagName)) {}

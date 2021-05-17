@@ -58,6 +58,51 @@ input[type]
     muttiline
 */
 
-a[href^="#"] {
+#block1 {
+    width: 300px;
+    height: auto;
+}
 
+#block1 .blockin {
+    width: 20%;
+    float: left;
+    text-align: center;
+    border: 1px solid gray;
+    border-radius: 3px;
+    margin: 5px;
+}
+
+#block1 .blockin img {
+    display: none;
+}
+
+#block1 .blockin:hover > img {
+    display: inline;
+    cursor: pointer;
+}
+
+#block1 .blockin:hover {
+    cursor: pointer;
+}
+
+#block1 .blockin:first-child {
+    color: red;
+}
+
+#block1 .blockin:last-child {
+    color: blue;
+}
+
+/*   asd   */
+
+a:not([href="#"]) {
+    color: red;
+}
+
+a:not([href]) {
+    color: green;
+}
+
+a[href="#"] {
+    color: blue;
 }

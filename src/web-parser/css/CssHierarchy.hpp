@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <optional>
 
+#include "Css.hpp"
+
 namespace Css
 {
 	class HierarchyNode
