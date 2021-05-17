@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <optional>
 #include <utility>
 #include <cstdint>
@@ -43,7 +44,7 @@ namespace HtmlParser
 	private:
 		inline XmlNode& AddChild(XmlNode& node)
 		{
-			std::vector<std::string> attributePackList = SmartSplitAttributes(node.m_TagName);
+			std::vector<std::string> attributePackList = StringUtils::SmartSplitAttributes(node.m_TagName);
 			for (auto & attrPack : attributePackList) {
 				auto del = attrPack.find('=');
 
@@ -53,6 +54,12 @@ namespace HtmlParser
 
 				std::string attrName = attrPack.substr(0, del);
 				std::string attrValue = attrPack.substr(del + 1);
+
+				while(attrName.length() > 0 && attrName[0] == ' ') {
+					attrName = attrName.substr(1);
+				}
+
+				std::cout << attrName << std::endl;
 
 				if(attrValue.length() == 0) {
 					continue;
@@ -67,7 +74,7 @@ namespace HtmlParser
 				}
 
 				if(attrName == "class") {
-					node.m_ElementClasses = SplitString(attrValue, ' ');
+					node.m_ElementClasses = StringUtils::SplitString(attrValue, ' ');
 				}
 			}
 

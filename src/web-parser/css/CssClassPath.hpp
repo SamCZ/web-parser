@@ -16,7 +16,7 @@ namespace Css
 	public:
 		explicit ClassPath(const std::string& path)
 		{
-			auto list = SplitString(path, ' ');
+			auto list = StringUtils::SplitString(path, ' ');
 
 			// TODO: build css path
 		}

@@ -89,7 +89,7 @@ namespace Css::CssParser
 			fourSize = data;
 		}
 
-		std::vector<std::string> split = SplitString(value, ' ');
+		std::vector<std::string> split = StringUtils::SplitString(value, ' ');
 
 		switch (split.size()) {
 			case 1: {
