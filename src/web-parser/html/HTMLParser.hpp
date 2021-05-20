@@ -59,8 +59,6 @@ namespace HtmlParser
 					attrName = attrName.substr(1);
 				}
 
-				std::cout << attrName << std::endl;
-
 				if(attrValue.length() == 0) {
 					continue;
 				}
